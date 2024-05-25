@@ -11,15 +11,14 @@ let host = undefined;
 let playerId = "";
 let showQueue = false;
 let rematch = false;
-let mainThemeAudio = new Audio('audio/theme.mp3');
+let mainThemeAudio = new Audio('audio/atheme.mp3');
 mainThemeAudio.loop = true;
 mainThemeAudio.volume = .2;
 let contentBG = document.querySelector("body");
 let colorMap = {
-    "red":"#ff5555",
-    "yellow":"#ffaa00",
-    "green":"#55aa55",
-    "blue":"#5555fd"
+    "red":"#B3292C",
+    "green":"#53A949",
+    "blue":"#2C6EB3"
 }
 for(let i=0;i<32;i++){
     playerId += String((Math.floor(Math.random()*10)))
@@ -137,7 +136,7 @@ addEventListener('DOMContentLoaded',()=>{
                 swal.fire({
                    confirmButtonColor:"#2c3e50",
                     icon: 'info',
-                    title: "your game id is : "+gameId,      
+                    title: "あなたのゲームID : "+gameId,      
                     showConfirmButton:true
                 });
             });
@@ -231,7 +230,7 @@ addEventListener('DOMContentLoaded',()=>{
                         swal.fire({
                    confirmButtonColor:"#2c3e50",
                             icon: 'info',
-                            title: "your game id is : "+gameId,      
+                            title: "あなたのゲームID : "+gameId,      
                             showConfirmButton:true
                         });
                     });

@@ -22,39 +22,42 @@
   
     <div id="method" class="modal">
         <div class="modal-content">
-          <h4>How do you want to play cards?</h4>
-        </div>
-        <div class="modal-footer">
-          <a class="modal-close waves-effect waves-green btn-flat" id="snglClickBtn">click</a>
-          <a class="modal-close waves-effect waves-green btn-flat" id="dblClickBtn">double click</a>
+          <div class="modal-content">
+            <img src="title.png" style="max-width: 100%; height: auto;">
+            <h4>めくりかたを選んで</h4>
+          </div>
+          <div class="modal-footer">
+            <a class="modal-close waves-effect waves-green btn-flat" id="snglClickBtn">クリック</a>
+            <a class="modal-close waves-effect waves-green btn-flat" id="dblClickBtn">ダブルクリック</a>
+          </div>
         </div>
       </div>
     <div id="modal1" class="modal">
         <div class="modal-content">
-          <h4>welcome to uno multiplayer</h4>
-          <p>please enter your name</p>
-          <input type="text" id="nameInput" placeholder="name" value="default-name">
+          <h4>KILL TIME CARDS へようこそ</h4>
+          <p>お名前を入力してください</p>
+          <input type="text" id="nameInput" placeholder="name" value="おなまえ">
         </div>
         <div class="modal-footer">
-          <a class="modal-close waves-effect waves-green btn-flat" id="nameEnterBtn">Next</a>
+          <a class="modal-close waves-effect waves-green btn-flat" id="nameEnterBtn">次へ</a>
         </div>
       </div>
 
 
   <div id="modal2" class="modal">
     <div class="modal-content">
-      <p>would you like to host a game ot join another game?</p>
+      <p>ゲームをホストしますか？参加しますか？(※要ゲームID)</p>
     </div>
     <div class="modal-footer">
-      <a class="modal-close waves-effect waves-green btn-flat" id="hostBtn">Host</a>
-      <a class="modal-close waves-effect waves-green btn-flat" id="joinBtn">Join</a>
+      <a class="modal-close waves-effect waves-green btn-flat" id="hostBtn">ホストする！</a>
+      <a class="modal-close waves-effect waves-green btn-flat" id="joinBtn">参加する！</a>
     </div>
   </div>
 
   <div id="modal3" class="host-modal modal">
     <div class="modal-content">
-      <h5>here is your game id make sure to send it to your friends so they can join you</h5>
-      <p id="gameIdText">gameid</p>
+      <h5>ゲームIDです。お友達へお伝えください。</h5>
+      <p id="gameIdText">ゲームID</p>
     </div>
     <div class="modal-footer">
       
@@ -65,7 +68,7 @@
 
   <div id="modal4" class="join-modal modal">
     <div class="modal-content">
-      <h4>please enter the id of the game you want to join</h4>
+      <h4>ゲームIDを入力してください。</h4>
       <input type="text" id="gameIdInput" placeholder="game id">
     </div>
     <div class="modal-footer">
@@ -79,7 +82,6 @@
           <option value="red">red</option>
           <option value="green">green</option>
           <option value="blue">blue</option>
-          <option value="yellow">yellow</option>
       </select>
     </div>
     <div class="modal-footer">

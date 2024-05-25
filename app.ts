@@ -25,7 +25,7 @@ app.use(express.static('styles'));
 const io = socketio.listen(server);
 
 app.get('/', (req,res) => {
-  res.sendFile(path.join(__dirname,"index.html"))
+  res.sendFile(path.join(__dirname,"../index.html"))
 })
 io.on("connection", (socket) => {
   

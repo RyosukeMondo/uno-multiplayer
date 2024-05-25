@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  app:
+    build: .
+    container_name: uno-multiplayer
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    environment:
+      - CONNECTION_STRING=mongodb://mongo:27017/unodb
+    command: npm start
+
+volumes:
+  mongo-data:

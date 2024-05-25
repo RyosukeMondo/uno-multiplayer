@@ -22,7 +22,7 @@ class Deck {
       }
     } else {
       random = Math.random();
-      if (random < 0.25) {
+      if (random < 0.33) {
         color = "red";
         random = Math.random();
         if (random < 0.5) {
@@ -32,17 +32,7 @@ class Deck {
           isSpecial = true;
           value = Math.floor(Math.random() *3)+1;
         }
-      } else if (random < 0.5) {
-        color = "yellow";
-        random = Math.random();
-        if (random < 0.5) {
-          value = Math.floor(Math.random() * 10);
-          isSpecial = false;
-        } else {
-          isSpecial = true;
-          value = Math.floor(Math.random() *3)+1;
-        }
-      } else if (random < 0.75) {
+      } else if (random < 0.66) {
         color = "blue";
         random = Math.random();
         if (random < 0.5) {
@@ -73,17 +63,12 @@ class Deck {
     let isSpecial: boolean = false;
     let color: string = undefined;
     random = Math.random();
-    if (random < 0.25) {
+    if (random < 0.33) {
       color = "red";
       random = Math.random();
       value = Math.floor(Math.random() * 10);
       isSpecial = false;
-    } else if (random < 0.5) {
-      color = "yellow";
-      random = Math.random();
-      value = Math.floor(Math.random() * 10);
-      isSpecial = false;
-    } else if (random < 0.75) {
+    } else if (random < 0.66) {
       color = "blue";
       random = Math.random();
       value = Math.floor(Math.random() * 10);
