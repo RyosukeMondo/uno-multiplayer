@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>uno multiplayer</title>
+    <title>KILL TIME CARDS</title>
     <link rel="icon" type="image/png" href="uno.png" />
 
     <!--material css-->
@@ -14,7 +14,13 @@
         <link rel="stylesheet" href="style.css">
    
      <link rel="stylesheet" href="owl.css">
-
+    <style>
+      .copy-icon {
+        cursor: pointer;
+        margin-left: 10px;
+        font-size: 1.2em;
+      }
+    </style>
 
 
 </head>
@@ -58,6 +64,7 @@
     <div class="modal-content">
       <h5>ゲームIDです。お友達へお伝えください。</h5>
       <p id="gameIdText">ゲームID</p>
+      <span class="copy-icon" onclick="copyToClipboard()">📋</span>
     </div>
     <div class="modal-footer">
       
@@ -78,7 +85,7 @@
   <div id="modal5" class="choose-color modal">
     <div class="modal-content">
       <h4>choose a color</h4>
-      <select>
+      <select name="colors">
           <option value="red">red</option>
           <option value="white">white</option>
           <option value="blue">blue</option>
@@ -145,6 +152,20 @@
 });
       
     </script>
+
+  <script>
+    function copyToClipboard() {
+      const gameIdText = document.getElementById('gameIdText').innerText;
+      const tempInput = document.createElement('input');
+      tempInput.value = gameIdText;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+      alert('ゲームIDがコピーされました');
+    }
+  </script>
+
     <script src="card.component.js"></script>
     <script src="deck.component.js"></script>
     <script src="players.compnent.js"></script>
