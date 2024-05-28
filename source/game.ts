@@ -62,7 +62,7 @@ class Game {
    * 0 => false
    * 1 => true
    * 2 => +2
-   * 4 => -2
+   * 4 => -1
    * 3 => choose color
    * 5 => skip
    * 6 => inverse
@@ -146,8 +146,7 @@ class Game {
         return 7;
       }
       this.calculateNextTurn(game);
-      // -2 current user
-      this.removeCard(game, cardIndex);
+      // -1 current user
       this.removeCard(game, cardIndex);
       
       // Check if the current player has no cards left
