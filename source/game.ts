@@ -168,7 +168,7 @@ class Game {
     const game = await gameModel.findById(gameId);
     if (game.currentPlayerTurn != playerIndex) return 0;
     if (game.players[game.currentPlayerTurn].playerId != playerId) return 0;
-    if (["red", "blue", "green"].includes(color)) {
+    if (["red", "blue", "white"].includes(color)) {
       game.currentColor = color;
       this.calculateNextTurn(game);
       await game.save();

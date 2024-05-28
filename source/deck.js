@@ -54,7 +54,7 @@ class Deck {
                 }
             }
             else {
-                color = "green";
+                color = "white";
                 random = Math.random();
                 if (random < 0.5) {
                     value = Math.floor(Math.random() * 10);
@@ -87,7 +87,7 @@ class Deck {
             isSpecial = false;
         }
         else {
-            color = "green";
+            color = "white";
             random = Math.random();
             value = Math.floor(Math.random() * 10);
             isSpecial = false;

@@ -17,7 +17,7 @@ mainThemeAudio.volume = .2;
 let contentBG = document.querySelector("body");
 let colorMap = {
     "red":"#B3292C",
-    "green":"#53A949",
+    "white":"#FFFFFF",
     "blue":"#2C6EB3"
 }
 for(let i=0;i<32;i++){
