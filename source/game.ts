@@ -11,8 +11,8 @@ class Game {
     if (numberOfPlayers < 2) throw new Error("can't start a game with less than 2 players");
     const game = await gameModel.findById(gameId);
     for (let i = 0; i < numberOfPlayers; i++){
-      // draw 7 cards for each player 
-      for (let j = 0; j < 7; j++){
+      // draw 5 cards for each player 
+      for (let j = 0; j < 5; j++){
         let card: Card = this.deck.drawCard();
         game.players[i].cards.push(card);
       }
@@ -42,15 +42,23 @@ class Game {
   addCard(game,card: Card): void {
     game.players[game.currentPlayerTurn].cards.push(card);
   }
-  removeCard(game,index: number): void{
-    game.players[game.currentPlayerTurn].cards.splice(index, 1);
+  removeCard(game, index: number): void {
+    const currentPlayer = game.players[game.currentPlayerTurn];
+    
+    if (currentPlayer.cards.length > 0) {
+      if (index >= 0 && index < currentPlayer.cards.length) {
+        currentPlayer.cards.splice(index, 1);
+      } else {
+        currentPlayer.cards.splice(0, 1);
+      }
+    }
   }
   /**
    * -1 => not your turn
    * 0 => false
    * 1 => true
    * 2 => +2
-   * 4 => +4
+   * 4 => -2
    * 3 => choose color
    * 5 => skip
    * 6 => inverse
@@ -135,11 +143,9 @@ class Game {
         return 7;
       }
       this.calculateNextTurn(game);
-      // +4 current user
-      this.addCard(game,this.deck.drawCard());
-      this.addCard(game,this.deck.drawCard());
-      this.addCard(game,this.deck.drawCard());
-      this.addCard(game, this.deck.drawCard());
+      // -2 current user
+      this..removeCard(game,cardIndex);
+      this..removeCard(game,cardIndex);
       game.isReversed = !game.isReversed;
       this.calculateNextTurn(game);
       game.isReversed = !game.isReversed;
