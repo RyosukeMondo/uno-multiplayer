@@ -230,15 +230,15 @@ io.on("connection", (socket) => {
          playerId: game.players[data.playerIndex].playerId
        });
      } else if (isPlayed == 4) {
-      io.sockets.emit("chooseColor", {
-        gameId: data.gameId,
-        playerIndex: data.playerIndex,
-        playerId: game.players[data.playerIndex].playerId
-      });
+      // io.sockets.emit("chooseColor", {
+      //   gameId: data.gameId,
+      //   playerIndex: data.playerIndex,
+      //   playerId: game.players[data.playerIndex].playerId
+      // });
       gameController.calculateNextTurn(game);
-      io.to(game.players[game.currentPlayerTurn].socketId).emit("drawFour", {
-        gameId: data.gameId
-      });
+      // io.to(game.players[game.currentPlayerTurn].socketId).emit("drawFour", {
+      //   gameId: data.gameId
+      // });
       game.isReversed = !game.isReversed;
       gameController.calculateNextTurn(game);
        game.isReversed = !game.isReversed;

@@ -20,12 +20,7 @@ class Deck {
             random = Math.random();
             isSpecial = true;
             color = "black";
-            if (random < 0.5) {
-                value = 1;
-            }
-            else {
-                value = 2;
-            }
+            value = 2;
         }
         else {
             random = Math.random();
@@ -38,7 +33,7 @@ class Deck {
                 }
                 else {
                     isSpecial = true;
-                    value = Math.floor(Math.random() * 3) + 1;
+                    value = Math.floor(Math.random() * 4) + 1;
                 }
             }
             else if (random < 0.66) {
@@ -50,7 +45,7 @@ class Deck {
                 }
                 else {
                     isSpecial = true;
-                    value = Math.floor(Math.random() * 3) + 1;
+                    value = Math.floor(Math.random() * 4) + 1;
                 }
             }
             else {
@@ -62,7 +57,7 @@ class Deck {
                 }
                 else {
                     isSpecial = true;
-                    value = Math.floor(Math.random() * 3) + 1;
+                    value = Math.floor(Math.random() * 4) + 1;
                 }
             }
         }

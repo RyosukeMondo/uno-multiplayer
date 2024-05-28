@@ -158,11 +158,9 @@ class Game {
                     return 7;
                 }
                 this.calculateNextTurn(game);
-                // +4 current user
-                this.addCard(game, this.deck.drawCard());
-                this.addCard(game, this.deck.drawCard());
-                this.addCard(game, this.deck.drawCard());
-                this.addCard(game, this.deck.drawCard());
+                // -2 current user
+                this.removeCard(game, cardIndex);
+                this.removeCard(game, cardIndex);
                 game.isReversed = !game.isReversed;
                 this.calculateNextTurn(game);
                 game.isReversed = !game.isReversed;

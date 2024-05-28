@@ -641,7 +641,7 @@ addEventListener('DOMContentLoaded',()=>{
                 swal.fire({
                    confirmButtonColor:"#2c3e50",
                     icon: 'warning',
-                    title:"+4",
+                    title:"-2",
                     timer:500,
                     showConfirmButton:false
     
