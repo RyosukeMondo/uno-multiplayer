@@ -70,6 +70,7 @@ class Game {
     }
   }
 
+
   async play(gameId: mongoose.Types.ObjectId, playerIndex: number, cardIndex: number, card: Card, playerId: string): Promise<PlayCode> {
       card.isSpecial = card.isspecial;
       const game = await gameModel.findById(gameId);
@@ -137,9 +138,9 @@ class Game {
               this.calculateNextTurn(game);
               const nextPlayerIndex = game.currentPlayerTurn;
               game.players[nextPlayerIndex].cards = game.players[nextPlayerIndex].cards.slice(1);
-              if (game.players[game.currentPlayerTurn].cards.length == 0) {
+              if (game.players[nextPlayerIndex].cards.length === 0) {
                   await game.save();
-                  return PlayCode.GAME_END;
+                  return PlayCode.GAME_END;  // Next player wins
               }
               await game.save();
               return PlayCode.MINUS_ONE;
