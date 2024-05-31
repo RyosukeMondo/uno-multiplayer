@@ -71,98 +71,81 @@ class Game {
   }
 
   async play(gameId: mongoose.Types.ObjectId, playerIndex: number, cardIndex: number, card: Card, playerId: string): Promise<PlayCode> {
-    card.isSpecial = card.isspecial;
-    const game = await gameModel.findById(gameId);
-    if (game.currentPlayerTurn != playerIndex || game.players[game.currentPlayerTurn].playerId != playerId) return PlayCode.NOT_YOUR_TURN;
-    game.players[game.currentPlayerTurn].drawCard = 0;
-    let rule: Rules = new Rules(game.currentCard, card, game.currentColor);
-    let ruleNumber: Rule = rule.getRule();
-    if (ruleNumber === Rule.INVALID) return PlayCode.FALSE;
-    game.players[game.currentPlayerTurn].canEnd = true;
-    game.currentColor = card.color;
-    game.currentCard = card;
-    this.removeCard(game, cardIndex);
-    if (game.players[game.currentPlayerTurn].cards.length == 0) {
-      await game.save();
-      return PlayCode.GAME_END;
-    }
-    if (ruleNumber === Rule.NORMAL) {
-      game.players[game.currentPlayerTurn].score += 20;
-      if (game.players[game.currentPlayerTurn].score >= 500) {
-        await game.save();
-        return PlayCode.GAME_END;
-      }
-      this.calculateNextTurn(game);
-      await game.save();
-      return PlayCode.TRUE;
-    } else if (ruleNumber === Rule.PLUS_TWO) {
-      game.players[game.currentPlayerTurn].score += 20;
-      if (game.players[game.currentPlayerTurn].score >= 500) {
-        await game.save();
-        return PlayCode.GAME_END;
-      }
-      this.calculateNextTurn(game);
-      // draw 2 cards for the next player
-      this.addCard(game, this.deck.drawCard());
-      this.addCard(game, this.deck.drawCard());
-      await game.save();
-      return PlayCode.PLUS_TWO;
-    } else if (ruleNumber === Rule.HOP) {
-      game.players[game.currentPlayerTurn].score += 20;
-      if (game.players[game.currentPlayerTurn].score >= 500) {
-        await game.save();
-        return PlayCode.GAME_END;
-      }
-      // skip player
-      this.calculateNextTurn(game);
-      this.calculateNextTurn(game);
-      await game.save();
-      return PlayCode.SKIP;
-    } else if (ruleNumber === Rule.REVERSE) {
-      game.players[game.currentPlayerTurn].score += 20;
-      if (game.players[game.currentPlayerTurn].score >= 500) {
-        await game.save();
-        return PlayCode.GAME_END;
-      }
-      // reverse 
-      // reverse work as skip in case of 2 players 
-      if (game.numberOfPlayers > 2) {
-        game.isReversed = !game.isReversed;
-        this.calculateNextTurn(game);
-      }
-      await game.save();
-      return PlayCode.INVERSE;
-    } else if (ruleNumber === Rule.WILD_COLOR) {
-      game.players[game.currentPlayerTurn].score += 50;
-      if (game.players[game.currentPlayerTurn].score >= 500) {
-        await game.save();
-        return PlayCode.GAME_END;
-      }
-      await game.save();
-      return PlayCode.CHOOSE_COLOR;
-    } else if (ruleNumber === Rule.MINUS_ONE) {
-      game.players[game.currentPlayerTurn].score += 50;
-      if (game.players[game.currentPlayerTurn].score >= 500) {
-        await game.save();
-        return PlayCode.GAME_END;
-      }
-      this.calculateNextTurn(game);
-      // -1 current user
-      const nextPlayerIndex = game.currentPlayerTurn;
-      game.players[nextPlayerIndex].cards 
-      = game.players[nextPlayerIndex].cards.slice(1);
+      card.isSpecial = card.isspecial;
+      const game = await gameModel.findById(gameId);
 
-      // Check if the current player has no cards left
+      if (game.currentPlayerTurn != playerIndex || game.players[game.currentPlayerTurn].playerId != playerId) {
+          return PlayCode.NOT_YOUR_TURN;
+      }
+
+      // Check if the player is trying to play a special card as their last card
+      if (game.players[game.currentPlayerTurn].cards.length === 1 && card.isSpecial) {
+          return PlayCode.FALSE;  // Invalid operation
+      }
+
+      game.players[game.currentPlayerTurn].drawCard = 0;
+      let rule: Rules = new Rules(game.currentCard, card, game.currentColor);
+      let ruleNumber: Rule = rule.getRule();
+
+      if (ruleNumber === Rule.INVALID) {
+          return PlayCode.FALSE;
+      }
+
+      game.players[game.currentPlayerTurn].canEnd = true;
+      game.currentColor = card.color;
+      game.currentCard = card;
+      this.removeCard(game, cardIndex);
+
       if (game.players[game.currentPlayerTurn].cards.length == 0) {
-        await game.save();
-        return PlayCode.GAME_END;
+          await game.save();
+          return PlayCode.GAME_END;
       }
 
-      // this.calculateNextTurn(game); // Move to next player
-      await game.save();
-      return PlayCode.MINUS_ONE;
-    }
+      game.players[game.currentPlayerTurn].score += card.isSpecial ? 50 : 20;
+      if (game.players[game.currentPlayerTurn].score >= 500) {
+          await game.save();
+          return PlayCode.GAME_END;
+      }
+
+      switch (ruleNumber) {
+          case Rule.NORMAL:
+              this.calculateNextTurn(game);
+              await game.save();
+              return PlayCode.TRUE;
+          case Rule.PLUS_TWO:
+              this.calculateNextTurn(game);
+              this.addCard(game, this.deck.drawCard());
+              this.addCard(game, this.deck.drawCard());
+              await game.save();
+              return PlayCode.PLUS_TWO;
+          case Rule.HOP:
+              this.calculateNextTurn(game);
+              this.calculateNextTurn(game);
+              await game.save();
+              return PlayCode.SKIP;
+          case Rule.REVERSE:
+              if (game.numberOfPlayers > 2) {
+                  game.isReversed = !game.isReversed;
+                  this.calculateNextTurn(game);
+              }
+              await game.save();
+              return PlayCode.INVERSE;
+          case Rule.WILD_COLOR:
+              await game.save();
+              return PlayCode.CHOOSE_COLOR;
+          case Rule.MINUS_ONE:
+              this.calculateNextTurn(game);
+              const nextPlayerIndex = game.currentPlayerTurn;
+              game.players[nextPlayerIndex].cards = game.players[nextPlayerIndex].cards.slice(1);
+              if (game.players[game.currentPlayerTurn].cards.length == 0) {
+                  await game.save();
+                  return PlayCode.GAME_END;
+              }
+              await game.save();
+              return PlayCode.MINUS_ONE;
+      }
   }
+
 
   async changeCurrentColor(gameId: mongoose.Types.ObjectId, color: string, playerIndex: number, playerId: string) {
     const game = await gameModel.findById(gameId);
