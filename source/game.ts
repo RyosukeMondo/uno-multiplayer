@@ -163,7 +163,7 @@ class Game {
     }
   }
 
-  async changCurrentColor(gameId: mongoose.Types.ObjectId, color: string, playerIndex: number, playerId: string) {
+  async changeCurrentColor(gameId: mongoose.Types.ObjectId, color: string, playerIndex: number, playerId: string) {
     const game = await gameModel.findById(gameId);
     if (game.currentPlayerTurn != playerIndex) return 0;
     if (game.players[game.currentPlayerTurn].playerId != playerId) return 0;

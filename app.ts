@@ -262,7 +262,7 @@ io.on("connection", (socket) => {
     try {
       if(!data.gameId || !data.color || data.playerIndex === undefined  || !data.playerId)throw new Error("data is not enough");
       
-    await gameController.changCurrentColor(data.gameId, data.color, data.playerIndex, data.playerId);
+    await gameController.changeCurrentColor(data.gameId, data.color, data.playerIndex, data.playerId);
     let game = await gameModel.findById(data.gameId)
     let players = [];
     for (let player of game.players) {
