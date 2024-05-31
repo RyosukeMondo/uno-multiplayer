@@ -141,7 +141,7 @@ io.on("connection", (socket) => {
         players: players,
         currentCard: game.currentCard,
         currentPlayerTurn: game.currentPlayerTurn,
-        currenColor:game.currentColor
+        currentColor:game.currentColor
       });
     }
     
@@ -161,83 +161,84 @@ io.on("connection", (socket) => {
 
   // player play card
   socket.on("playCard", async (data) => {
-    try{
-    let playCode = await gameController.play(data.gameId, data.playerIndex, data.cardIndex, data.card,data.playerId);
-    if (playCode == PlayCode.NOT_YOUR_TURN) {
-      socket.emit("wrongTurn", {
-        gameId: data.gameId,
-        playerIndex: data.playerIndex,
-        playerId:data.playerId
-      });
-      return;
-    }else if (playCode == PlayCode.FALSE) {
-      socket.emit("wrongMove", {
-        gameId: data.gameId,
-        playerIndex: data.playerIndex,
-        playerId:data.playerId
-      });
-      return;
-    } 
-    let game = await gameModel.findById(data.gameId);
-    let players = [];
-    for (let player of game.players) {
-      players.push({
-        name: player.name,
-        index: player.index,
-        number:player.cards.length,
-        score:player.score
-      })
+    try {
+      let playCode = await gameController.play(data.gameId, data.playerIndex, data.cardIndex, data.card, data.playerId);
+      if (playCode == PlayCode.NOT_YOUR_TURN) {
+        socket.emit("wrongTurn", {
+          gameId: data.gameId,
+          playerIndex: data.playerIndex,
+          playerId: data.playerId
+        });
+        return;
+      } else if (playCode == PlayCode.FALSE) {
+        socket.emit("wrongMove", {
+          gameId: data.gameId,
+          playerIndex: data.playerIndex,
+          playerId: data.playerId
+        });
+        return;
       }
-      for (let player of game.players) { 
+      let game = await gameModel.findById(data.gameId);
+      let players = [];
+      for (let player of game.players) {
+        players.push({
+          name: player.name,
+          index: player.index,
+          number: player.cards.length,
+          score: player.score
+        })
+      }
+      for (let player of game.players) {
         io.to(player.socketId).emit("gameUpdated", {
           gameId: data.gameId,
           players: players,
           currentCard: game.currentCard,
           currentPlayerTurn: game.currentPlayerTurn,
-          currenColor: game.currentColor,
+          currentColor: game.currentColor,
           cardDrawn: (
-            playCode == PlayCode.MINUS_ONE || 
+            playCode == PlayCode.MINUS_ONE ||
             playCode == PlayCode.CHOOSE_COLOR ? true : false),
         });
       }
-   
-    for (let player of game.players) {
-      io.to(player.socketId).emit("getCards", {
-        playerId: player.playerId,
-        cards: player.cards,
-        gameId:data.gameId
-      });
-      
+
+      for (let player of game.players) {
+        io.to(player.socketId).emit("getCards", {
+          playerId: player.playerId,
+          cards: player.cards,
+          gameId: data.gameId
+        });
       }
-     if (playCode == PlayCode.PLUS_TWO) {
-      io.to(game.players[game.currentPlayerTurn].socketId).emit("drawTwo", {
-        gameId: data.gameId
-      });
-    } else if (playCode == 3) {
-       io.sockets.emit("chooseColor", {
-         gameId: data.gameId,
-         playerIndex: data.playerIndex,
-         playerId: game.players[data.playerIndex].playerId
-       });
-     } else if (playCode == PlayCode.MINUS_ONE) {
-      gameController.calculateNextTurn(game);
-      game.isReversed = !game.isReversed;
-      gameController.calculateNextTurn(game);
-       game.isReversed = !game.isReversed;
-     } else if (playCode == PlayCode.SKIP) {
-      io.sockets.emit("skipTurn", {
-        gameId: data.gameId
-      });
-     } else if (playCode == PlayCode.INVERSE) {
-      io.sockets.emit("reverseTurn", {
-        gameId: data.gameId
-      });
-     }else if (playCode == PlayCode.GAME_END) {
-      io.sockets.emit("gameEnd", { gameId:data.gameId,playerIndex:data.playerIndex,playerId:data.playerId,success: "game ended" });
-    }
+
+      if (playCode == PlayCode.PLUS_TWO) {
+        io.to(game.players[game.currentPlayerTurn].socketId).emit("drawTwo", {
+          gameId: data.gameId
+        });
+      } else if (playCode == PlayCode.CHOOSE_COLOR) {
+        io.sockets.emit("chooseColor", {
+          gameId: data.gameId,
+          playerIndex: data.playerIndex,
+          playerId: game.players[data.playerIndex].playerId
+        });
+        io.sockets.emit("colorChanged", {
+          gameId: data.gameId,
+          color: game.currentColor
+        });
+      } else if (playCode == PlayCode.MINUS_ONE) {
+        // Handle any specific logic for MINUS_ONE here if needed
+      } else if (playCode == PlayCode.SKIP) {
+        io.sockets.emit("skipTurn", {
+          gameId: data.gameId
+        });
+      } else if (playCode == PlayCode.INVERSE) {
+        io.sockets.emit("reverseTurn", {
+          gameId: data.gameId
+        });
+      } else if (playCode == PlayCode.GAME_END) {
+        io.sockets.emit("gameEnd", { gameId: data.gameId, playerIndex: data.playerIndex, playerId: data.playerId, success: "game ended" });
+      }
     } catch (err) {
-    socket.emit("errorInRequest",{msg:err.message});
-  }
+      socket.emit("errorInRequest", { msg: err.message });
+    }
   });
 
   socket.on("colorIsChosen", async (data) => {
@@ -261,7 +262,7 @@ io.on("connection", (socket) => {
           players: players,
           currentCard: game.currentCard,
           currentPlayerTurn: game.currentPlayerTurn,
-          currenColor: game.currentColor,
+          currentColor: game.currentColor,
           cardDrawn: true
         });
       }
@@ -302,7 +303,7 @@ io.on("connection", (socket) => {
           players: players,
           currentCard: game.currentCard,
           currentPlayerTurn: game.currentPlayerTurn,
-          currenColor: game.currentColor,
+          currentColor: game.currentColor,
           cardDrawn: true
         });
       }
@@ -327,7 +328,11 @@ io.on("connection", (socket) => {
       let game = await gameModel.findById(data.gameId);
       if(!game) throw new Error("no game with this id");
       
-      if (game.currentPlayerTurn == data.playerIndex && game.players[game.currentPlayerTurn].playerId == data.playerId && game.players[game.currentPlayerTurn].canEnd) {
+      if (
+        game.currentPlayerTurn == data.playerIndex && 
+        game.players[game.currentPlayerTurn].playerId == 
+        data.playerId && 
+        game.players[game.currentPlayerTurn].canEnd) {
         await gameController.calculateNextTurn(game);
         await game.save();
         let players = [];
@@ -345,7 +350,7 @@ io.on("connection", (socket) => {
             players: players,
             currentCard: game.currentCard,
             currentPlayerTurn: game.currentPlayerTurn,
-            currenColor: game.currentColor
+            currentColor: game.currentColor
           });
         }
         
@@ -429,7 +434,7 @@ io.on("connection", (socket) => {
                 players: players,
                 currentCard: game.currentCard,
                 currentPlayerTurn: game.currentPlayerTurn,
-                currenColor: game.currentColor
+                currentColor: game.currentColor
               });
             }
             
@@ -501,7 +506,7 @@ io.on("connection", (socket) => {
         players: players,
         currentCard: game.currentCard,
         currentPlayerTurn: game.currentPlayerTurn,
-        currenColor:game.currentColor
+        currentColor:game.currentColor
       });
     }
     
@@ -561,7 +566,7 @@ io.on("connection", (socket) => {
                 players: players,
                 currentCard: game.currentCard,
                 currentPlayerTurn: game.currentPlayerTurn,
-                currenColor: game.currentColor
+                currentColor: game.currentColor
               });
             }
             

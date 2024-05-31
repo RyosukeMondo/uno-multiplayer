@@ -148,22 +148,21 @@ class Game {
       }
       this.calculateNextTurn(game);
       // -1 current user
-      this.removeCard(game, cardIndex);
-      
+      const nextPlayerIndex = game.currentPlayerTurn;
+      game.players[nextPlayerIndex].cards 
+      = game.players[nextPlayerIndex].cards.slice(1);
+
       // Check if the current player has no cards left
       if (game.players[game.currentPlayerTurn].cards.length == 0) {
         await game.save();
         return PlayCode.GAME_END;
       }
 
-      game.isReversed = !game.isReversed;
-      this.calculateNextTurn(game);
-      game.isReversed = !game.isReversed;
+      // this.calculateNextTurn(game); // Move to next player
       await game.save();
       return PlayCode.MINUS_ONE;
     }
   }
-
 
   async changeCurrentColor(gameId: mongoose.Types.ObjectId, color: string, playerIndex: number, playerId: string) {
     const game = await gameModel.findById(gameId);

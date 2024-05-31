@@ -353,7 +353,7 @@ addEventListener('DOMContentLoaded',()=>{
                 document.querySelector(".board")
             );
     
-            contentBG.style.backgroundColor = colorMap[data.currenColor];
+            contentBG.style.backgroundColor = colorMap[data.currentColor];
             let drawBtn = document.createElement("button");
             drawBtn.className = "waves-effect waves-light btn";
             drawBtn.innerText = "draw card";
@@ -431,7 +431,7 @@ addEventListener('DOMContentLoaded',()=>{
                 }, null),
                 document.querySelector(".board")
               );
-              contentBG.style.backgroundColor = colorMap[data.currenColor];
+              contentBG.style.backgroundColor = colorMap[data.currentColor];
          
         });
     
