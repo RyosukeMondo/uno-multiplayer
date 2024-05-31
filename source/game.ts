@@ -1,7 +1,7 @@
 import Card from './card';
 import Deck from './deck';
 import Player from './player';
-import Rules from './rules';
+import Rules, { Rule } from './rules';
 import mongoose from 'mongoose';
 import { gameModel } from '../model/db-model';
 
@@ -58,6 +58,7 @@ class Game {
   }
 
   /**
+   * PlayedCode
    * -1 => not your turn
    * 0 => false
    * 1 => true
@@ -74,8 +75,8 @@ class Game {
     if (game.currentPlayerTurn != playerIndex || game.players[game.currentPlayerTurn].playerId != playerId) return -1;
     game.players[game.currentPlayerTurn].drawCard = 0;
     let rule: Rules = new Rules(game.currentCard, card, game.currentColor);
-    let ruleNumber: number = rule.getRule();
-    if (!ruleNumber) return 0;
+    let ruleNumber: Rule = rule.getRule();
+    if (ruleNumber === Rule.INVALID) return 0;
     game.players[game.currentPlayerTurn].canEnd = true;
     game.currentColor = card.color;
     game.currentCard = card;
@@ -84,7 +85,7 @@ class Game {
       await game.save();
       return 7;
     }
-    if (ruleNumber == 1) {
+    if (ruleNumber === Rule.NORMAL) {
       game.players[game.currentPlayerTurn].score += 20;
       if (game.players[game.currentPlayerTurn].score >= 500) {
         await game.save();
@@ -93,7 +94,7 @@ class Game {
       this.calculateNextTurn(game);
       await game.save();
       return 1;
-    } else if (ruleNumber == 2) {
+    } else if (ruleNumber === Rule.PLUS_TWO) {
       game.players[game.currentPlayerTurn].score += 20;
       if (game.players[game.currentPlayerTurn].score >= 500) {
         await game.save();
@@ -105,7 +106,7 @@ class Game {
       this.addCard(game, this.deck.drawCard());
       await game.save();
       return 2;
-    } else if (ruleNumber == 3) {
+    } else if (ruleNumber === Rule.HOP) {
       game.players[game.currentPlayerTurn].score += 20;
       if (game.players[game.currentPlayerTurn].score >= 500) {
         await game.save();
@@ -117,7 +118,7 @@ class Game {
 
       await game.save();
       return 5;
-    } else if (ruleNumber == 4) {
+    } else if (ruleNumber === Rule.REVERSE) {
       game.players[game.currentPlayerTurn].score += 20;
       if (game.players[game.currentPlayerTurn].score >= 500) {
         await game.save();
@@ -131,7 +132,7 @@ class Game {
       }
       await game.save();
       return 6;
-    } else if (ruleNumber == 5) {
+    } else if (ruleNumber === Rule.WILD_COLOR) {
       game.players[game.currentPlayerTurn].score += 50;
       if (game.players[game.currentPlayerTurn].score >= 500) {
         await game.save();
@@ -139,7 +140,7 @@ class Game {
       }
       await game.save();
       return 3;
-    } else if (ruleNumber == 6) {
+    } else if (ruleNumber === Rule.MINUS_ONE) {
       game.players[game.currentPlayerTurn].score += 50;
       if (game.players[game.currentPlayerTurn].score >= 500) {
         await game.save();
