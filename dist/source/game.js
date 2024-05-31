@@ -26,8 +26,8 @@ class Game {
                 throw new Error("can't start a game with less than 2 players");
             const game = yield db_model_1.gameModel.findById(gameId);
             for (let i = 0; i < numberOfPlayers; i++) {
-                // draw 7 cards for each player 
-                for (let j = 0; j < 7; j++) {
+                // draw 5 cards for each player 
+                for (let j = 0; j < 5; j++) {
                     let card = this.deck.drawCard();
                     game.players[i].cards.push(card);
                 }
@@ -59,14 +59,22 @@ class Game {
         game.players[game.currentPlayerTurn].cards.push(card);
     }
     removeCard(game, index) {
-        game.players[game.currentPlayerTurn].cards.splice(index, 1);
+        const currentPlayer = game.players[game.currentPlayerTurn];
+        if (currentPlayer.cards.length > 0) {
+            if (index >= 0 && index < currentPlayer.cards.length) {
+                currentPlayer.cards.splice(index, 1);
+            }
+            else {
+                currentPlayer.cards.splice(0, 1);
+            }
+        }
     }
     /**
      * -1 => not your turn
      * 0 => false
      * 1 => true
      * 2 => +2
-     * 4 => +4
+     * 4 => -1
      * 3 => choose color
      * 5 => skip
      * 6 => inverse
@@ -74,7 +82,6 @@ class Game {
      */
     play(gameId, playerIndex, cardIndex, card, playerId) {
         return __awaiter(this, void 0, void 0, function* () {
-            // console.log(playerIndex, cardIndex, card);
             card.isSpecial = card.isspecial;
             const game = yield db_model_1.gameModel.findById(gameId);
             if (game.currentPlayerTurn != playerIndex || game.players[game.currentPlayerTurn].playerId != playerId)
@@ -158,11 +165,13 @@ class Game {
                     return 7;
                 }
                 this.calculateNextTurn(game);
-                // +4 current user
-                this.addCard(game, this.deck.drawCard());
-                this.addCard(game, this.deck.drawCard());
-                this.addCard(game, this.deck.drawCard());
-                this.addCard(game, this.deck.drawCard());
+                // -1 current user
+                this.removeCard(game, cardIndex);
+                // Check if the current player has no cards left
+                if (game.players[game.currentPlayerTurn].cards.length == 0) {
+                    yield game.save();
+                    return 7;
+                }
                 game.isReversed = !game.isReversed;
                 this.calculateNextTurn(game);
                 game.isReversed = !game.isReversed;
@@ -213,7 +222,7 @@ class Game {
                 game.players[i].canEnd = false;
                 game.players[i].score = 0;
                 // draw 7 cards for each player 
-                for (let j = 0; j < 7; j++) {
+                for (let j = 0; j < 5; j++) {
                     let card = this.deck.drawCard();
                     game.players[i].cards.push(card);
                 }

@@ -36,7 +36,7 @@ app.use(express_1.default.static('output'));
 app.use(express_1.default.static('styles'));
 const io = socket_io_1.default.listen(server);
 app.get('/', (req, res) => {
-    res.sendFile(path_1.default.join(__dirname, "index.html"));
+    res.sendFile(path_1.default.join(__dirname, "../index.html"));
 });
 io.on("connection", (socket) => {
     socket.on("createGame", (data) => __awaiter(void 0, void 0, void 0, function* () {
@@ -233,13 +233,13 @@ io.on("connection", (socket) => {
             }
             else if (isPlayed == 4) {
                 // io.sockets.emit("chooseColor", {
-                //     gameId: data.gameId,
-                //     playerIndex: data.playerIndex,
-                //     playerId: game.players[data.playerIndex].playerId
+                //   gameId: data.gameId,
+                //   playerIndex: data.playerIndex,
+                //   playerId: game.players[data.playerIndex].playerId
                 // });
                 gameController.calculateNextTurn(game);
                 // io.to(game.players[game.currentPlayerTurn].socketId).emit("drawFour", {
-                //     gameId: data.gameId
+                //   gameId: data.gameId
                 // });
                 game.isReversed = !game.isReversed;
                 gameController.calculateNextTurn(game);
