@@ -5,6 +5,19 @@ import Rules, { Rule } from './rules';
 import mongoose from 'mongoose';
 import { gameModel } from '../model/db-model';
 
+
+export enum PlayCode {
+  NOT_YOUR_TURN = -1,
+  FALSE = 0,
+  TRUE = 1,
+  PLUS_TWO = 2,
+  MINUS_ONE = 4,
+  CHOOSE_COLOR = 3,
+  SKIP = 5,
+  INVERSE = 6,
+  GAME_END = 7
+}
+
 class Game {
   deck: Deck = new Deck();
 
@@ -57,72 +70,59 @@ class Game {
     }
   }
 
-  /**
-   * PlayedCode
-   * -1 => not your turn
-   * 0 => false
-   * 1 => true
-   * 2 => +2
-   * 4 => -1
-   * 3 => choose color
-   * 5 => skip
-   * 6 => inverse
-   * 7 => game end
-   */
-  async play(gameId: mongoose.Types.ObjectId, playerIndex: Number, cardIndex: number, card: Card, playerId: string) {
+  async play(gameId: mongoose.Types.ObjectId, playerIndex: number, cardIndex: number, card: Card, playerId: string): Promise<PlayCode> {
     card.isSpecial = card.isspecial;
     const game = await gameModel.findById(gameId);
-    if (game.currentPlayerTurn != playerIndex || game.players[game.currentPlayerTurn].playerId != playerId) return -1;
+    if (game.currentPlayerTurn != playerIndex || game.players[game.currentPlayerTurn].playerId != playerId) return PlayCode.NOT_YOUR_TURN;
     game.players[game.currentPlayerTurn].drawCard = 0;
     let rule: Rules = new Rules(game.currentCard, card, game.currentColor);
     let ruleNumber: Rule = rule.getRule();
-    if (ruleNumber === Rule.INVALID) return 0;
+    if (ruleNumber === Rule.INVALID) return PlayCode.FALSE;
     game.players[game.currentPlayerTurn].canEnd = true;
     game.currentColor = card.color;
     game.currentCard = card;
     this.removeCard(game, cardIndex);
     if (game.players[game.currentPlayerTurn].cards.length == 0) {
       await game.save();
-      return 7;
+      return PlayCode.GAME_END;
     }
     if (ruleNumber === Rule.NORMAL) {
       game.players[game.currentPlayerTurn].score += 20;
       if (game.players[game.currentPlayerTurn].score >= 500) {
         await game.save();
-        return 7;
+        return PlayCode.GAME_END;
       }
       this.calculateNextTurn(game);
       await game.save();
-      return 1;
+      return PlayCode.TRUE;
     } else if (ruleNumber === Rule.PLUS_TWO) {
       game.players[game.currentPlayerTurn].score += 20;
       if (game.players[game.currentPlayerTurn].score >= 500) {
         await game.save();
-        return 7;
+        return PlayCode.GAME_END;
       }
       this.calculateNextTurn(game);
       // draw 2 cards for the next player
       this.addCard(game, this.deck.drawCard());
       this.addCard(game, this.deck.drawCard());
       await game.save();
-      return 2;
+      return PlayCode.PLUS_TWO;
     } else if (ruleNumber === Rule.HOP) {
       game.players[game.currentPlayerTurn].score += 20;
       if (game.players[game.currentPlayerTurn].score >= 500) {
         await game.save();
-        return 7;
+        return PlayCode.GAME_END;
       }
       // skip player
       this.calculateNextTurn(game);
       this.calculateNextTurn(game);
-
       await game.save();
-      return 5;
+      return PlayCode.SKIP;
     } else if (ruleNumber === Rule.REVERSE) {
       game.players[game.currentPlayerTurn].score += 20;
       if (game.players[game.currentPlayerTurn].score >= 500) {
         await game.save();
-        return 7;
+        return PlayCode.GAME_END;
       }
       // reverse 
       // reverse work as skip in case of 2 players 
@@ -131,20 +131,20 @@ class Game {
         this.calculateNextTurn(game);
       }
       await game.save();
-      return 6;
+      return PlayCode.INVERSE;
     } else if (ruleNumber === Rule.WILD_COLOR) {
       game.players[game.currentPlayerTurn].score += 50;
       if (game.players[game.currentPlayerTurn].score >= 500) {
         await game.save();
-        return 7;
+        return PlayCode.GAME_END;
       }
       await game.save();
-      return 3;
+      return PlayCode.CHOOSE_COLOR;
     } else if (ruleNumber === Rule.MINUS_ONE) {
       game.players[game.currentPlayerTurn].score += 50;
       if (game.players[game.currentPlayerTurn].score >= 500) {
         await game.save();
-        return 7;
+        return PlayCode.GAME_END;
       }
       this.calculateNextTurn(game);
       // -1 current user
@@ -153,16 +153,17 @@ class Game {
       // Check if the current player has no cards left
       if (game.players[game.currentPlayerTurn].cards.length == 0) {
         await game.save();
-        return 7;
+        return PlayCode.GAME_END;
       }
 
       game.isReversed = !game.isReversed;
       this.calculateNextTurn(game);
       game.isReversed = !game.isReversed;
       await game.save();
-      return 4;
+      return PlayCode.MINUS_ONE;
     }
   }
+
 
   async changeCurrentColor(gameId: mongoose.Types.ObjectId, color: string, playerIndex: number, playerId: string) {
     const game = await gameModel.findById(gameId);
